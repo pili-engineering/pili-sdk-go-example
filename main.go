@@ -32,7 +32,7 @@ func main() {
 		}
 		listResult, err := Hub.ListStreams(options)
 		if err != nil {
-			c.HTML(400, "index.tmpl", gin.H{"error": err})
+			c.HTML(400, "error.tmpl", gin.H{"error": err})
 			c.Abort()
 		}
 		c.HTML(200, "index.tmpl", gin.H{
@@ -45,17 +45,36 @@ func main() {
 		streamId := c.Query("stream")
 		stream, err := Hub.GetStream(streamId)
 		if err != nil {
-			c.HTML(400, "player.tmpl", gin.H{"error": err})
+			c.HTML(400, "error.tmpl", gin.H{"error": err})
 			c.Abort()
 		}
-		urls, err := stream.RtmpLiveUrls()
+
+		liveRtmpUrls, err := stream.RtmpLiveUrls()
 		if err != nil {
 			fmt.Println("Error:", err)
+			c.HTML(400, "error.tmpl", gin.H{"error": err})
+			c.Abort()
+		}
+
+		liveHlsUrls, err := stream.HlsLiveUrls()
+		if err != nil {
+			fmt.Println("Error:", err)
+			c.HTML(400, "error.tmpl", gin.H{"error": err})
+			c.Abort()
+		}
+
+		liveHdlUrls, err := stream.HttpFlvLiveUrls()
+		if err != nil {
+			fmt.Println("Error:", err)
+			c.HTML(400, "error.tmpl", gin.H{"error": err})
+			c.Abort()
 		}
 
 		c.HTML(200, "player.tmpl", gin.H{
-			"stream": stream,
-			"urls":   urls["ORIGIN"],
+			"stream":      stream,
+			"liveRtmpUrl": liveRtmpUrls["ORIGIN"],
+			"liveHlsUrl":  liveHlsUrls["ORIGIN"],
+			"liveHdlUrl":  liveHdlUrls["ORIGIN"],
 		})
 	})
 

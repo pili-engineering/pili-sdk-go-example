@@ -9,8 +9,13 @@
   <link rel="stylesheet" type="text/css" href="//dn-cdnjscn.qbox.me/ajax/libs/twitter-bootstrap/3.3.4/css/bootstrap.min.css">
   <style type="text/css">
     body{ padding: 20px; }
-    #chart{
-      max-width: 640px;
+    #player-wrap{
+      width: 640px;
+      height: 480px;
+    }
+    .table{
+      width: 640px;
+      margin-top: 20px;
     }
   </style>
 
@@ -35,11 +40,35 @@
 
 </head>
 <body>
-	<div style="width: 640px; height: 480px;">
-		<script type="text/javascript" src="../assets/player/sewise.player.min.js?server=live&type=rtmp&streamurl={{.urls}}&autostart=true&buffer=5&lang=zh_CN&title=LiveVideo&skin=liveWhite"></script>
+	<div id="player-wrap">
+		<script type="text/javascript" src="../assets/player/sewise.player.min.js?server=live&type=rtmp&streamurl={{.liveRtmpUrl}}&autostart=true&buffer=5&lang=zh_CN&title=LiveVideo&skin=liveWhite"></script>
 	</div>
 
-  <table class="table table-bordered" style="width: 640px; margin-top: 20px;">
+
+  <table class="table table-bordered">
+    <tbody>
+      <tr>
+        <th colspan="2">Live play urls</th>
+      </tr>
+    </tbody>
+    <tbody>
+      <tr>
+        <th>RTMP</th>
+        <td>{{.liveRtmpUrl}}</td>
+      </tr>
+      <tr>
+        <th>HLS</th>
+        <td>{{.liveHlsUrl}}</td>
+      </tr>
+      <tr>
+        <th>HDL</th>
+        <td>{{.liveHdlUrl}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <table class="table table-bordered">
     <tbody>
       <tr>
         <th>推流状态:</th>
@@ -55,7 +84,7 @@
       </tr>
       <tr>
         <th>推流实时码率:</th>
-        <td><span id="bps"></span>Kb/s </td>
+        <td><span id="bps"></span> kbit/s</td>
       </tr>
       <tr>
         <th colspan="2">推流实时帧率:</th>
@@ -63,20 +92,18 @@
       <tr>
         <tr>
           <td>Audio:</td>
-          <td><span id="fps-audio"></span>fps</td>
+          <td><span id="fps-audio"></span> fps</td>
         </tr>
         <tr>
           <td>Video:</td>
-          <td><span id="fps-video"></span>fps</td>
+          <td><span id="fps-video"></span> fps</td>
         </tr>
         <tr>
           <td>Data:</td>
-          <td><span id="fps-data"></span>fps</td>
+          <td><span id="fps-data"></span> fps</td>
         </tr>
       </tr>
     </tbody>
   </table>
-
-  <!-- <div id="chart"></div> -->
 </body>
 </html>

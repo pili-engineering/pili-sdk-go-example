@@ -2,20 +2,92 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/pili-engineering/pili-sdk-go/pili"
+
+	pili2 "github.com/pili-engineering/pili-sdk-go.v2/pili"
 )
 
 const (
 	ACCESS_KEY = "ACCESS_KEY"
 	SECRET_KEY = "SECRET_KEY"
 	HUB_NAME   = "HUB_NAME"
+	//for v2
+	PUB_DOMAIN       = "PUB_DOMAIN"
+	PLAY_RTMP_DOMAIN = "PLAY_RTMP_DOMAIN"
+	PLAY_HLS_DOMAIN  = "PLAY_HLS_DOMAIN"
+	PLAY_HDL_DOMAIN  = "PLAY_HDL_DOMAIN"
 )
 
 var Hub pili.Hub
 
-func main() {
+func v2() {
+	mac := &pili2.MAC{ACCESS_KEY, []byte(SECRET_KEY)}
+	client := pili2.New(mac, nil)
+	hub := client.Hub(HUB_NAME)
 
+	router := gin.Default()
+	router.Static("/assets", "./assets")
+	router.LoadHTMLGlob("templates/*")
+
+	// Stream list
+	router.GET("/", func(c *gin.Context) {
+		streams, _, err := hub.ListLive("", 1000, "")
+		if err != nil {
+			c.HTML(400, "error.tmpl", gin.H{"error": err})
+			c.Abort()
+		}
+		c.HTML(200, "index2.tmpl", gin.H{
+			"streams": streams,
+		})
+	})
+
+	// Player
+	router.GET("/player", func(c *gin.Context) {
+		streamId := c.Query("stream")
+		liveRtmpUrl := pili2.RTMPPlayURL(PLAY_RTMP_DOMAIN, HUB_NAME, streamId)
+
+		liveHlsUrl := pili2.HLSPlayURL(PLAY_HLS_DOMAIN, HUB_NAME, streamId)
+
+		liveHdlUrl := pili2.HDLPlayURL(PLAY_HDL_DOMAIN, HUB_NAME, streamId)
+
+		c.HTML(200, "player2.tmpl", gin.H{
+			"stream":      streamId,
+			"liveRtmpUrl": liveRtmpUrl,
+			"liveHlsUrl":  liveHlsUrl,
+			"liveHdlUrl":  liveHdlUrl,
+		})
+	})
+
+	// API
+	router.POST("/api/stream", func(c *gin.Context) {
+		id := fmt.Sprintf("%d-%d", time.Now().Nanosecond(), rand.Int31n(256))
+		url := pili2.RTMPPublishURL(PUB_DOMAIN, HUB_NAME, id, mac, 3600)
+		c.String(200, url)
+	})
+
+	// API
+	// "/api/stream/z1.abclive.5633b990eb6f9213a2002473/status"
+	router.GET("/api/stream/:id/status", func(c *gin.Context) {
+		id := c.Params.ByName("id")
+		stream := hub.Stream(id)
+		status, err := stream.LiveStatus()
+		if err != nil {
+			c.JSON(400, err)
+			c.Abort()
+		}
+
+		c.JSON(200, status)
+	})
+
+	// Listen and server on 0.0.0.0:8070
+	router.Run(":8070")
+}
+
+func v1() {
 	credentials := pili.NewCredentials(ACCESS_KEY, SECRET_KEY)
 	Hub = pili.NewHub(credentials, HUB_NAME)
 
@@ -117,4 +189,9 @@ func main() {
 
 	// Listen and server on 0.0.0.0:8080
 	router.Run(":8080")
+}
+
+func main() {
+	go v2()
+	v1()
 }

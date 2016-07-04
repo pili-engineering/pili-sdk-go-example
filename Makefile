@@ -1,6 +1,7 @@
 env:
 	go get "github.com/gin-gonic/gin"
 	go get "github.com/pili-engineering/pili-sdk-go/pili"
+	go get "github.com/pili-engineering/pili-sdk-go.v2/pili"
 
 
 build-linux: env

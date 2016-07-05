@@ -64,7 +64,7 @@ func v2() {
 
 	// API
 	router.POST("/api/stream", func(c *gin.Context) {
-		id := fmt.Sprintf("%d-%d", time.Now().Nanosecond(), rand.Int31n(256))
+		id := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Int31n(256))
 		url := pili2.RTMPPublishURL(PUB_DOMAIN, HUB_NAME, id, mac, 3600)
 		c.String(200, url)
 	})

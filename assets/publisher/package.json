@@ -1,0 +1,20 @@
+{
+  "author": "Giving Stage Team",
+  "name": "actionscript-publisher",
+  "domains": [
+  ],
+  "version": "0.0.1",
+  "description": "ActionScript recorder",
+  "main": "server.coffee",
+  "scripts": {},
+  "repository": "https://github.com/givingstage/actionscript-publisher",
+  "dependencies": {
+    "connect": "^2.15.0"
+  },
+  "devDependencies": {},
+  "license": "Copyrighted / All Rights Reserved",
+  "engines": {
+    "node": "0.10.x"
+  },
+  "private": true
+}

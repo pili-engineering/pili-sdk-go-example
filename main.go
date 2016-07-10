@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -62,9 +63,21 @@ func v2() {
 		})
 	})
 
+	// Publisher
+	router.GET("/publisher", func(c *gin.Context) {
+		id := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Int31n(256))
+		url := pili2.RTMPPublishURL(PUB_DOMAIN, HUB_NAME, id, mac, 3600)
+		baseUrl := fmt.Sprintf("rtmp://%s/%s/", PUB_DOMAIN, HUB_NAME)
+		stream := strings.TrimPrefix(url, baseUrl)
+		c.HTML(200, "publisher2.tmpl", gin.H{
+			"pubRtmpUrlBase":   baseUrl,
+			"pubRtmpUrlStream": stream,
+		})
+	})
+
 	// API
 	router.POST("/api/stream", func(c *gin.Context) {
-		id := fmt.Sprintf("%d-%d", time.Now().Nanosecond(), rand.Int31n(256))
+		id := fmt.Sprintf("%d-%d", time.Now().UnixNano(), rand.Int31n(256))
 		url := pili2.RTMPPublishURL(PUB_DOMAIN, HUB_NAME, id, mac, 3600)
 		c.String(200, url)
 	})
@@ -149,6 +162,17 @@ func v1() {
 			"liveHdlUrl":  liveHdlUrls["ORIGIN"],
 		})
 	})
+
+	// // Publisher
+	// router.GET("/publisher", func(c *gin.Context) {
+
+	// 	c.HTML(200, "pubisher.tmpl", gin.H{
+	// 		"stream":      stream,
+	// 		"liveRtmpUrl": liveRtmpUrls["ORIGIN"],
+	// 		"liveHlsUrl":  liveHlsUrls["ORIGIN"],
+	// 		"liveHdlUrl":  liveHdlUrls["ORIGIN"],
+	// 	})
+	// }
 
 	// API
 	router.POST("/api/stream", func(c *gin.Context) {

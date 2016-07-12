@@ -246,12 +246,16 @@ func v1() {
 		}
 		stream, err := Hub.CreateStream(options)
 		if err != nil {
-			c.String(400, err.Error())
-			c.Abort()
-			return
+			stream, err = Hub.GetStream("z1." + HUB_V1_NAME + "." + id)
+			if err != nil {
+				c.JSON(400, err)
+				c.Abort()
+				return
+			}
 		}
 		streamJson, err := stream.ToJSONString()
 		if err != nil {
+			fmt.Println(err)
 			c.String(400, err.Error())
 			c.Abort()
 			return
@@ -262,7 +266,7 @@ func v1() {
 	// API
 	router.GET("/api/stream/:id/play", func(c *gin.Context) {
 		id := c.Params.ByName("id")
-		stream, err := Hub.GetStream(id)
+		stream, err := Hub.GetStream("z1." + HUB_V1_NAME + "." + id)
 		if err != nil {
 			c.JSON(400, err)
 			c.Abort()
